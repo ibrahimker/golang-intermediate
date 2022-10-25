@@ -1,0 +1,44 @@
+basePath: /
+host: localhost:8080
+info:
+  contact:
+    email: ibrahimker@gmail.com
+    name: Ibrahim Nurandita Isbandiputra
+  description: This is a todo list test management application
+  title: Todo Application
+  version: "1.0"
+paths:
+  /todos:
+    get:
+      consumes:
+      - application/json
+      description: get all todo list
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+      summary: Get new todos
+      tags:
+      - orders
+    post:
+      consumes:
+      - application/json
+      description: get string by ID
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+      summary: Create new todos
+      tags:
+      - orders
+swagger: "2.0"
