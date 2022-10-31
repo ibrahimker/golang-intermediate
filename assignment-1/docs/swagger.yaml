@@ -41,4 +41,53 @@ paths:
       summary: Create new todos
       tags:
       - orders
+  /todos/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete string by ID
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+      summary: Delete new todos
+      tags:
+      - orders
+    get:
+      consumes:
+      - application/json
+      description: get all todo list
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+      summary: GetByID new todos
+      tags:
+      - orders
+    put:
+      consumes:
+      - application/json
+      description: Update todos by ID
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+      summary: Update new todos
+      tags:
+      - orders
 swagger: "2.0"
