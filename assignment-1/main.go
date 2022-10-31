@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 
@@ -8,6 +9,12 @@ import (
 	_ "github.com/ibrahimker/golang-intermediate/assignment-1/docs"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
+
+type Todo struct {
+	Name string `json:"name"`
+}
+
+var Todos []*Todo
 
 const baseURL = "0.0.0.0:8080"
 
@@ -25,6 +32,7 @@ func main() {
 	r.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 
 	// serve http server
+	log.Println("Listening in url " + baseURL)
 	log.Fatal(http.ListenAndServe(baseURL, r))
 }
 
@@ -37,7 +45,11 @@ func main() {
 // @Success 200 {array} string
 // @Router /todos [post]
 func Create(w http.ResponseWriter, r *http.Request) {
-
+	var t Todo
+	decoder := json.NewDecoder(r.Body)
+	_ = decoder.Decode(&t)
+	Todos = append(Todos, &t)
+	w.Write([]byte("Success add todo " + t.Name))
 }
 
 // Get is a handler for get todos API
@@ -49,5 +61,7 @@ func Create(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {array} string
 // @Router /todos [get]
 func Get(w http.ResponseWriter, r *http.Request) {
-
+	todosRes, _ := json.Marshal(Todos)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(todosRes)
 }
