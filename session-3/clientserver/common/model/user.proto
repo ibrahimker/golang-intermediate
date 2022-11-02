@@ -4,6 +4,7 @@ package session3.clientserver.model;
 
 option go_package = "github.com/ibrahimker/golang-intermediate/session-3/clientserver/model";
 
+import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 
 enum UserGender {
@@ -24,6 +25,15 @@ message UserList {
 }
 
 service Users {
-  rpc Register(User) returns (google.protobuf.Empty) {}
-  rpc List(google.protobuf.Empty) returns (UserList) {}
+  rpc Register(User) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post : "/v1/users",
+      body:"*"
+    };
+  }
+  rpc List(google.protobuf.Empty) returns (UserList) {
+    option (google.api.http) = {
+      get : "/v1/users",
+    };
+  }
 }
