@@ -2,13 +2,17 @@ package main
 
 import (
 	"context"
+	"flag"
 	"log"
 	"net"
+	"net/http"
 
 	"github.com/golang/protobuf/ptypes/empty"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/ibrahimker/golang-intermediate/session-3/clientserver/common/config"
 	"github.com/ibrahimker/golang-intermediate/session-3/clientserver/common/model"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 var localStorage *model.UserList
@@ -46,5 +50,16 @@ func main() {
 	if err != nil {
 		log.Fatalf("could not listen. Err: %+v\n", err)
 	}
+
+	// setup http proxy
+	go func() {
+		mux := runtime.NewServeMux()
+		opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
+		grpcServerEndpoint := flag.String("grpc-server-endpoint", "localhost"+config.SERVICE_USER_PORT, "gRPC server endpoint")
+		_ = model.RegisterUsersHandlerFromEndpoint(context.Background(), mux, *grpcServerEndpoint, opts)
+		log.Println("Starting User Server HTTP at 9001 ")
+		http.ListenAndServe(":9001", mux)
+	}()
 	log.Fatalln(srv.Serve(listener))
+
 }

@@ -4,6 +4,7 @@ package session3.clientserver.model;
 
 option go_package = "github.com/ibrahimker/golang-intermediate/session-3/clientserver/model";
 
+import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 
 enum UserGender {
