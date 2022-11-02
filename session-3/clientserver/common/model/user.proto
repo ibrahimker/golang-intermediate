@@ -24,6 +24,15 @@ message UserList {
 }
 
 service Users {
-  rpc Register(User) returns (google.protobuf.Empty) {}
-  rpc List(google.protobuf.Empty) returns (UserList) {}
+  rpc Register(User) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post : "/v1/users",
+      body:"*"
+    };
+  }
+  rpc List(google.protobuf.Empty) returns (UserList) {
+    option (google.api.http) = {
+      get : "/v1/users",
+    };
+  }
 }

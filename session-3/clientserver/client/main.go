@@ -40,6 +40,7 @@ func main() {
 		Password: "for the horde",
 		Gender:   model.UserGender_FEMALE,
 	}
+	log.Printf("Hit userSvc.Register %+v\n", user1)
 	_, _ = userSvc.Register(ctx, user1)
 
 	user2 := &model.User{
@@ -48,8 +49,10 @@ func main() {
 		Password: "for the horde",
 		Gender:   model.UserGender_MALE,
 	}
+	log.Printf("Hit userSvc.Register %+v\n", user2)
 	_, _ = userSvc.Register(ctx, user2)
 
+	log.Printf("Hit userSvc.List\n")
 	users, _ := userSvc.List(ctx, new(empty.Empty))
 	log.Printf("List Users %+v\n", users.GetList())
 

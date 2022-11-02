@@ -23,6 +23,7 @@ type UsersServer struct {
 }
 
 func (u UsersServer) Register(ctx context.Context, req *model.User) (*empty.Empty, error) {
+	log.Printf("Register user request %+v\n", req)
 	localStorage.List = append(localStorage.List, req)
 	log.Println("Registering user", req.String())
 
@@ -30,6 +31,7 @@ func (u UsersServer) Register(ctx context.Context, req *model.User) (*empty.Empt
 }
 
 func (u UsersServer) List(context.Context, *empty.Empty) (*model.UserList, error) {
+	log.Printf("List user request\n")
 	return localStorage, nil
 }
 
