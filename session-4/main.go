@@ -47,7 +47,7 @@ func main() {
 }
 
 func handleRoute(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.New("main-template").Parse(view))
+	tmpl := template.Must(template.New("main-template").ParseFiles("./login.html"))
 	if err := tmpl.Execute(w, nil); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
