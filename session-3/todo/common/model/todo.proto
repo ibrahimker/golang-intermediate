@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+package session3.todo.model;
+
+option go_package = "github.com/ibrahimker/golang-intermediate/session-3/todo/model";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+service TodoService {
+  rpc GetAll(google.protobuf.Empty) returns (GetAllResponse) {
+    option (google.api.http) = {
+      get : "/todos",
+    };
+  }
+
+  rpc GetByID(GetByIDRequest) returns (GetByIDResponse) {
+    option (google.api.http) = {
+      get : "/todos/{id}",
+    };
+  }
+
+  rpc Create(Todo) returns (MutationResponse) {
+    option (google.api.http) = {
+      post : "/todos",
+      body : "*",
+    };
+  }
+
+  rpc Update(UpdateRequest) returns (MutationResponse) {
+    option (google.api.http) = {
+      put : "/todos/{id}",
+      body : "*",
+    };
+  }
+
+  rpc Delete(DeleteRequest) returns (MutationResponse) {
+    option (google.api.http) = {
+      delete : "/todos/{id}",
+    };
+  }
+}
+
+message Todo {
+  string id = 1;
+  string name = 2;
+}
+
+message GetAllResponse {
+  repeated Todo data = 1;
+}
+
+message GetAllRequest {
+  repeated Todo data = 1;
+}
+
+message GetByIDRequest {
+  string id = 1;
+}
+
+message GetByIDResponse {
+  Todo data = 1;
+}
+
+message MutationResponse {
+  string success = 1;
+}
+
+message UpdateRequest {
+  string id = 1;
+  string name = 2;
+}
+
+message DeleteRequest {
+  string id = 1;
+}
