@@ -14,26 +14,6 @@ import (
 const (
 	port    = "9000"
 	baseURL = "0.0.0.0:" + port
-	view    = `
-		<html>
-		<head>
-			<title>Template</title>
-		</head>
-		<body>
-			<form method="post" action="/login">
-				<div>
-					<label>username</label>
-					<input type="text" name="username" required/>
-				</div>
-				<div>
-					<label>password</label>
-					<input type="password" name="password" required/>
-				</div>
-				<button type="submit">Login</button>
-			</form>
-		</body>
-		</html>
-	`
 )
 
 func main() {
