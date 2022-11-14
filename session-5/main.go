@@ -5,13 +5,28 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/go-playground/validator"
 	"github.com/labstack/echo"
 )
 
 type M map[string]interface{}
 
+type User struct {
+	Name  string `json:"name" form:"name" query:"name" validate:"required"`
+	Email string `json:"email" form:"email" query:"email" validate:"required,email"`
+}
+
+type CustomValidator struct {
+	validator *validator.Validate
+}
+
+func (cv *CustomValidator) Validate(i interface{}) error {
+	return cv.validator.Struct(i)
+}
+
 func main() {
 	r := echo.New()
+	r.Validator = &CustomValidator{validator: validator.New()}
 
 	r.GET("/", func(ctx echo.Context) error {
 		data := "Hello from /index"
@@ -71,6 +86,20 @@ func main() {
 		)
 
 		return ctx.String(http.StatusOK, data)
+	})
+
+	r.POST("/user", func(ctx echo.Context) error {
+		u := new(User)
+
+		if err := ctx.Bind(u); err != nil {
+			return ctx.String(http.StatusInternalServerError, err.Error())
+		}
+
+		if err := ctx.Validate(u); err != nil {
+			return ctx.String(http.StatusBadRequest, err.Error())
+		}
+
+		return ctx.JSON(http.StatusOK, u)
 	})
 
 	r.Start(":9000")
