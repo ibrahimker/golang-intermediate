@@ -10,11 +10,16 @@ import (
 )
 
 const (
-	ldapServer   = "ldap.forumsys.com"
+	//ldapServer   = "ldap.forumsys.com"
+	//ldapPort     = 389
+	//ldapBindDN   = "cn=read-only-admin,dc=example,dc=com"
+	//ldapPassword = "password"
+	//ldapSearchDN = "dc=example,dc=com"
+	ldapServer   = "localhost"
 	ldapPort     = 389
-	ldapBindDN   = "cn=read-only-admin,dc=example,dc=com"
+	ldapBindDN   = "cn=admin,dc=ibrahimker,dc=id"
 	ldapPassword = "password"
-	ldapSearchDN = "dc=example,dc=com"
+	ldapSearchDN = "dc=ibrahimker,dc=id"
 )
 
 type UserLDAPData struct {
