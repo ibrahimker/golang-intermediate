@@ -2,17 +2,46 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
+	"os"
 
+	"github.com/antonlindstrom/pgstore"
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo"
 )
 
 const SESSION_ID = "test-session-id"
 
+func newPostgresStore() *pgstore.PGStore {
+	url := "postgres://postgresuser:postgrespassword@127.0.0.1:5432/postgres?sslmode=disable"
+	authKey := []byte("my-auth-key-very-secret")
+	encryptionKey := []byte("my-encryption-key-very-secret123")
+
+	store, err := pgstore.NewPGStore(url, authKey, encryptionKey)
+	if err != nil {
+		log.Println("ERROR", err)
+		os.Exit(0)
+	}
+
+	return store
+}
+
+func newCookieStore() *sessions.CookieStore {
+	authKey := []byte("my-auth-key-very-secret")
+	encryptionKey := []byte("my-encryption-key-very-secret123")
+
+	store := sessions.NewCookieStore(authKey, encryptionKey)
+	store.Options.Path = "/"
+	store.Options.MaxAge = 86400 * 7
+	store.Options.HttpOnly = true
+
+	return store
+}
+
 func main() {
 	e := echo.New()
-	store := sessions.NewCookieStore([]byte("test-session-key"))
+	store := newPostgresStore()
 
 	e.GET("/", func(ctx echo.Context) error {
 		data := "Hello from /index"
