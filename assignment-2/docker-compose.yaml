@@ -9,9 +9,16 @@ services:
       - POSTGRES_DB=postgres
     ports:
       - 5432:5432
-#  server:
-#    image: hacktiv-assignment-2:latest
-#    ports:
-#      - 8080:8080
-#    depends_on:
-#      - postgres
+    networks:
+      - assignment-2
+  server:
+    image: hacktiv-assignment-2:latest
+    ports:
+      - 8080:8080
+    depends_on:
+      - postgres
+    networks:
+      - assignment-2
+
+networks:
+  assignment-2:

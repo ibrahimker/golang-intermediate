@@ -5,6 +5,8 @@ COPY . .
 FROM alpine:3.13
 WORKDIR /app
 COPY --from=builder /app/deploy/hacktiv-assignment-2 .
+COPY --from=builder /app/template /app/template/.
+RUN ls
 EXPOSE 8080
 
 ENV APP_NAME=hacktiv-assignment-2

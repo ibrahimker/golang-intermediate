@@ -9,7 +9,7 @@ import (
 
 const (
 	SESSION_ID   = "test-id"
-	POSTGRES_URL = "postgres://postgresuser:postgrespassword@127.0.0.1:5432/postgres?sslmode=disable"
+	POSTGRES_URL = "postgres://postgresuser:postgrespassword@postgres:5432/postgres?sslmode=disable"
 )
 
 var (

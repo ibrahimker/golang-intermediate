@@ -18,16 +18,16 @@ type HTMLTemplate struct {
 }
 
 type Login struct {
-	cs  *sessions.CookieStore
-	pgs *pgstore.PGStore
-	ur  *repository.User
+	cs      *sessions.CookieStore
+	pgStore *pgstore.PGStore
+	ur      *repository.User
 }
 
 func NewLoginHandler(cs *sessions.CookieStore, pgs *pgstore.PGStore, ur *repository.User) *Login {
 	return &Login{
-		cs:  cs,
-		pgs: pgs,
-		ur:  ur,
+		cs:      cs,
+		pgStore: pgs,
+		ur:      ur,
 	}
 }
 
@@ -45,7 +45,7 @@ func (l *Login) LoginHandler(c echo.Context) error {
 	log.Info("Successfully authenticate user", user)
 
 	// store username in session
-	if err = storeSessionHelper(c, l.pgs, user.Username); err != nil {
+	if err = storeSessionHelper(c, l.pgStore, user.Username); err != nil {
 		log.Warn("error when store session")
 		return c.Render(http.StatusOK, "login.html", HTMLTemplate{
 			User: entity.User{},
@@ -59,7 +59,7 @@ func (l *Login) LoginHandler(c echo.Context) error {
 func (l *Login) HomeHandler(c echo.Context) error {
 	log.Info("Start Home Handler")
 
-	session, err := l.pgs.Get(c.Request(), driver.SESSION_ID)
+	session, err := l.pgStore.Get(c.Request(), driver.SESSION_ID)
 	if err != nil {
 		log.WithError(err).Warn("error when retrieve session")
 		return c.Redirect(http.StatusTemporaryRedirect, "/login")
@@ -79,7 +79,7 @@ func (l *Login) HomeHandler(c echo.Context) error {
 
 func (l *Login) LogoutHandler(c echo.Context) error {
 	log.Info("Start Logout Handler")
-	session, _ := l.pgs.Get(c.Request(), driver.SESSION_ID)
+	session, _ := l.pgStore.Get(c.Request(), driver.SESSION_ID)
 	session.Options.MaxAge = -1
 	session.Save(c.Request(), c.Response())
 
