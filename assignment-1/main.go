@@ -1,12 +1,15 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
 	_ "github.com/ibrahimker/golang-intermediate/assignment-1/docs"
+	"github.com/jackc/pgx/v4/pgxpool"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
@@ -15,7 +18,11 @@ type Todo struct {
 	Name string `json:"name"`
 }
 
-var Todos []*Todo
+var (
+	Todos        []*Todo
+	postgrespool *pgxpool.Pool
+	perr         error
+)
 
 const baseURL = "0.0.0.0:8080"
 
@@ -29,6 +36,11 @@ const baseURL = "0.0.0.0:8080"
 func main() {
 	r := mux.NewRouter()
 
+	postgrespool, perr = newPostgresPool("localhost", "5432", "postgresuser", "postgrespassword", "postgres")
+	if perr != nil {
+		log.Fatal(perr)
+	}
+
 	r.HandleFunc("/todos", Get).Methods(http.MethodGet)
 	r.HandleFunc("/todos/{id}", GetByID).Methods(http.MethodGet)
 	r.HandleFunc("/todos", Create).Methods(http.MethodPost)
@@ -40,6 +52,18 @@ func main() {
 	// serve http server
 	log.Println("Listening in url " + baseURL)
 	log.Fatal(http.ListenAndServe(baseURL, r))
+}
+
+// newPostgresPool builds a pool of pgx client.
+func newPostgresPool(host, port, user, password, name string) (*pgxpool.Pool, error) {
+	connCfg := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		host,
+		port,
+		user,
+		password,
+		name,
+	)
+	return pgxpool.Connect(context.Background(), connCfg)
 }
 
 // Create is a handler for create todos API
@@ -108,7 +132,21 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {array} string
 // @Router /todos [get]
 func Get(w http.ResponseWriter, r *http.Request) {
-	todosRes, _ := json.Marshal(Todos)
+	var todos []Todo
+	rows, err := postgrespool.Query(context.Background(), "select id,name from todo")
+	if err != nil {
+		log.Println(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var t Todo
+		if err := rows.Scan(&t.ID, &t.Name); err != nil {
+			log.Println(err)
+		}
+		todos = append(todos, t)
+	}
+	fmt.Println("todos", todos)
+	todosRes, _ := json.Marshal(todos)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(todosRes)
 }
