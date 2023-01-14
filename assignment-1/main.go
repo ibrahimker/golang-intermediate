@@ -78,7 +78,9 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	var t Todo
 	decoder := json.NewDecoder(r.Body)
 	_ = decoder.Decode(&t)
-	Todos = append(Todos, &t)
+
+	_, _ = postgrespool.Exec(context.Background(), "insert into todo(id,name) values ($1,$2)", t.ID, t.Name)
+
 	w.Write([]byte("Success add todo " + t.Name))
 }
 
