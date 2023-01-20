@@ -37,6 +37,11 @@ func main() {
 
 	r.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 
+	//http.Server{
+	//	Addr:    baseURL,
+	//	Handler: r,
+	//}
+
 	// serve http server
 	log.Println("Listening in url " + baseURL)
 	log.Fatal(http.ListenAndServe(baseURL, r))
