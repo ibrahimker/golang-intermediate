@@ -9,6 +9,7 @@ import (
 	"github.com/antonlindstrom/pgstore"
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 )
 
 const SESSION_ID = "test-session-id"
@@ -41,10 +42,15 @@ func newCookieStore() *sessions.CookieStore {
 
 func main() {
 	e := echo.New()
-	store := newPostgresStore()
+	store := newCookieStore()
 
+	root := e.Group("/")        // /
+	todo := root.Group("/todo") // /todo
+	todo.Use()
+	_ = todo.Group("/user", middleware.Logger()) // /todo/user
+	e.Group("/user")
 	e.GET("/", func(ctx echo.Context) error {
-		data := "Hello from /index"
+		data := "Hello from /"
 		return ctx.String(http.StatusOK, data)
 	})
 

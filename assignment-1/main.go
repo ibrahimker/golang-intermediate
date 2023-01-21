@@ -89,6 +89,9 @@ func Put(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {array} string
 // @Router /todos/{id} [delete]
 func Delete(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "192.168.1.100")
+	w.Header().Set("Access-Control-Allow-Methods", "OPTIONS, GET, POST, PUT")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, X-CSRF-Token")
 	id := mux.Vars(r)["id"]
 	for i := 0; i < len(Todos); i++ {
 		if Todos[i].ID == id {
@@ -108,6 +111,9 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {array} string
 // @Router /todos [get]
 func Get(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "192.168.1.100")
+	w.Header().Set("Access-Control-Allow-Methods", "OPTIONS, GET, POST, PUT")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, X-CSRF-Token")
 	todosRes, _ := json.Marshal(Todos)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(todosRes)
@@ -122,6 +128,9 @@ func Get(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {array} string
 // @Router /todos/{id} [get]
 func GetByID(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "192.168.1.100")
+	w.Header().Set("Access-Control-Allow-Methods", "OPTIONS, GET, POST, PUT")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, X-CSRF-Token")
 	id := mux.Vars(r)["id"]
 	for i := 0; i < len(Todos); i++ {
 		if Todos[i].ID == id {
