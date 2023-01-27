@@ -1,25 +1,13 @@
-package ldap
+package repository
 
 import (
 	"errors"
 	"fmt"
 
+	"github.com/ibrahimker/golang-intermediate/session-4/config"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/go-ldap/ldap"
-)
-
-const (
-	//ldapServer   = "ldap.forumsys.com"
-	//ldapPort     = 389
-	//ldapBindDN   = "cn=read-only-admin,dc=example,dc=com"
-	//ldapPassword = "password"
-	//ldapSearchDN = "dc=example,dc=com"
-	ldapServer   = "localhost"
-	ldapPort     = 389
-	ldapBindDN   = "cn=admin,dc=ibrahimker,dc=id"
-	ldapPassword = "password"
-	ldapSearchDN = "dc=ibrahimker,dc=id"
 )
 
 type UserLDAPData struct {
@@ -29,23 +17,17 @@ type UserLDAPData struct {
 	FullName string
 }
 
-func AuthUsingLDAP(username, password string) (bool, *UserLDAPData, error) {
+type LDAPRepo struct {
+	conn *ldap.Conn
+}
 
-	// init ldap connection
-	l, err := ldap.Dial("tcp", fmt.Sprintf("%s:%d", ldapServer, ldapPort))
-	if err != nil {
-		log.Error(err)
-		return false, nil, err
-	}
-	defer l.Close()
+func NewLDAPRepo(conn *ldap.Conn) *LDAPRepo {
+	return &LDAPRepo{conn: conn}
+}
 
-	// bind to ldap server
-	if err = l.Bind(ldapBindDN, ldapPassword); err != nil {
-		return false, nil, err
-	}
-
+func (r *LDAPRepo) AuthUsingLDAP(username, password string) (bool, *UserLDAPData, error) {
 	searchRequest := ldap.NewSearchRequest(
-		ldapSearchDN,
+		config.LdapSearchDN,
 		ldap.ScopeWholeSubtree,
 		ldap.NeverDerefAliases,
 		0,
@@ -56,7 +38,7 @@ func AuthUsingLDAP(username, password string) (bool, *UserLDAPData, error) {
 		nil,
 	)
 
-	sr, err := l.Search(searchRequest)
+	sr, err := r.conn.Search(searchRequest)
 	if err != nil {
 		log.Error(err)
 		return false, nil, err
@@ -67,7 +49,7 @@ func AuthUsingLDAP(username, password string) (bool, *UserLDAPData, error) {
 	}
 
 	entry := sr.Entries[0]
-	if err = l.Bind(entry.DN, password); err != nil {
+	if err = r.conn.Bind(entry.DN, password); err != nil {
 		log.Error(err)
 		return false, nil, err
 	}
