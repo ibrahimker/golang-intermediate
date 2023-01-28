@@ -71,6 +71,14 @@ func (l *Login) HomeHandler(c echo.Context) error {
 	}
 
 	log.Info("Session exists, render html")
+
+	session.Options.MaxAge = 300
+	session.Store()
+	log.Info("updating session data")
+	if err := session.Save(c.Request(), c.Response()); err != nil {
+		log.Error(err)
+	}
+
 	return c.Render(http.StatusOK, "home.html", HTMLTemplate{
 		User: entity.User{Username: session.Values["username"].(string)},
 		Err:  "",
