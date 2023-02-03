@@ -7,13 +7,18 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+type IUser interface {
+	Insert(ctx context.Context, user *entity.User) error
+	GetByUsernamePassword(ctx context.Context, username, password string) (*entity.User, error)
+}
+
 // User is responsible to connect user entity with users table in PostgreSQL.
 type User struct {
 	pool PgxPoolIface
 }
 
 // NewUser creates an instance of User.
-func NewUser(pool PgxPoolIface) *User {
+func NewUser(pool PgxPoolIface) IUser {
 	return &User{pool: pool}
 }
 

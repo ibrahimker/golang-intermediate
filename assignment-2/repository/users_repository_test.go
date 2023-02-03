@@ -8,7 +8,7 @@ import (
 
 	"github.com/ibrahimker/golang-intermediate/assignment-2/entity"
 	"github.com/ibrahimker/golang-intermediate/assignment-2/repository"
-	"github.com/pashagolub/pgxmock"
+	"github.com/pashagolub/pgxmock/v2"
 	"github.com/stretchr/testify/require"
 )
 
@@ -32,6 +32,24 @@ func TestInsert(t *testing.T) {
 			LastName:  "",
 			Password:  "",
 		})
-		require.Equal(t, "database down", err.Error())
+		require.Error(t, err)
+	})
+
+	t.Run("success", func(t *testing.T) {
+		mock, _ := pgxmock.NewConn()
+		userRepo := repository.NewUser(mock)
+		rows := mock.NewRows([]string{"id"}).
+			AddRow(5)
+		mock.
+			ExpectQuery(regexp.QuoteMeta(query)).WithArgs("username", "", "", "").WillReturnRows(rows)
+
+		err := userRepo.Insert(context.Background(), &entity.User{
+			ID:        0,
+			Username:  "username",
+			FirstName: "",
+			LastName:  "",
+			Password:  "",
+		})
+		require.NoError(t, err)
 	})
 }
