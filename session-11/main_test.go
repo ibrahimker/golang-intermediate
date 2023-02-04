@@ -57,3 +57,17 @@ func TestRegisterToDB(t *testing.T) {
 		require.NoError(t, err)
 	})
 }
+
+func TestRegisterToDBWithTimestamp(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	t.Run("case sukses", func(t *testing.T) {
+		userRepo := mock_repository.NewMockIUser(ctrl)
+		userRepo.EXPECT().RegisterWithTimestamp("username", "password", gomock.Any()).Return(nil)
+
+		err := RegisterToDBWithTimestamp(userRepo, "username", "password")
+
+		require.NoError(t, err)
+	})
+}

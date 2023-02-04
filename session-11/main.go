@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/ibrahimker/golang-intermediate/session-11/repository"
 )
@@ -32,6 +33,14 @@ func Register(username, password string) error {
 
 func RegisterToDB(userRepo repository.IUser, username, password string) error {
 	if err := userRepo.Register(username, password); err != nil {
+		log.Println(err)
+		return err
+	}
+	return nil
+}
+
+func RegisterToDBWithTimestamp(userRepo repository.IUser, username, password string) error {
+	if err := userRepo.RegisterWithTimestamp(username, password, time.Now()); err != nil {
 		log.Println(err)
 		return err
 	}

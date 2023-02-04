@@ -6,6 +6,7 @@ package mock_repository
 
 import (
 	reflect "reflect"
+	time "time"
 
 	gomock "github.com/golang/mock/gomock"
 )
@@ -45,4 +46,18 @@ func (m *MockIUser) Register(username, password string) error {
 func (mr *MockIUserMockRecorder) Register(username, password interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Register", reflect.TypeOf((*MockIUser)(nil).Register), username, password)
+}
+
+// RegisterWithTimestamp mocks base method.
+func (m *MockIUser) RegisterWithTimestamp(username, password string, createdAt time.Time) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RegisterWithTimestamp", username, password, createdAt)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RegisterWithTimestamp indicates an expected call of RegisterWithTimestamp.
+func (mr *MockIUserMockRecorder) RegisterWithTimestamp(username, password, createdAt interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterWithTimestamp", reflect.TypeOf((*MockIUser)(nil).RegisterWithTimestamp), username, password, createdAt)
 }
