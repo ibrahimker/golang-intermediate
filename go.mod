@@ -1,6 +1,6 @@
 module github.com/ibrahimker/golang-intermediate
 
-go 1.18
+go 1.20
 
 require (
 	github.com/antonlindstrom/pgstore v0.0.0-20220421113606-e3a6e3fed12a
