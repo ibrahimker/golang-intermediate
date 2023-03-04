@@ -5,12 +5,21 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/ibrahimker/golang-intermediate/session-8/middleware"
 	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
-	log "github.com/sirupsen/logrus"
+	echoMiddleware "github.com/labstack/echo/middleware"
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
 func main() {
+	viper.AddConfigPath("./config")
+	viper.SetConfigName("config.yaml")
+	viper.SetConfigType("yaml")
+	if err := viper.ReadInConfig(); err != nil {
+		panic(err)
+	}
+
 	e := echo.New()
 	e.Use(middlewareOne)
 	e.Use(middlewareTwo)
@@ -32,7 +41,7 @@ func main() {
 	})
 
 	private := e.Group("/private")
-	private.Use(middleware.BasicAuth(authMiddleware))
+	private.Use(echoMiddleware.BasicAuth(middleware.BasicAuthMiddleware))
 	private.GET("/index", func(c echo.Context) (err error) {
 		fmt.Println("threeeeee!")
 
@@ -63,14 +72,14 @@ func middlewareSomething(next http.Handler) http.Handler {
 	})
 }
 
-func makeLogEntry(c echo.Context) *log.Entry {
+func makeLogEntry(c echo.Context) *logrus.Entry {
 	if c == nil {
-		return log.WithFields(log.Fields{
+		return logrus.WithFields(logrus.Fields{
 			"at": time.Now().Format("2006-01-02 15:04:05"),
 		})
 	}
 
-	return log.WithFields(log.Fields{
+	return logrus.WithFields(logrus.Fields{
 		"at":     time.Now().Format("2006-01-02 15:04:05"),
 		"method": c.Request().Method,
 		"uri":    c.Request().URL.String(),
@@ -95,12 +104,4 @@ func errorHandler(err error, c echo.Context) {
 
 	makeLogEntry(c).Error(report.Message)
 	c.HTML(report.Code, report.Message.(string))
-}
-
-func authMiddleware(username, password string, c echo.Context) (bool, error) {
-	// Be careful to use constant time comparison to prevent timing attacks
-	if username == "user" && password == "password" {
-		return true, nil
-	}
-	return false, nil
 }
