@@ -6,14 +6,12 @@ import (
 	"net/http"
 
 	"github.com/crewjam/saml/samlsp"
+	"github.com/labstack/echo"
 )
 
 func landingHandler(w http.ResponseWriter, r *http.Request) {
 	name := samlsp.AttributeFromContext(r.Context(), "displayName")
 	w.Write([]byte(fmt.Sprintf("Welcome, %s!", name)))
-}
-func helloHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Hello!"))
 }
 
 func main() {
@@ -21,16 +19,18 @@ func main() {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-	http.Handle("/saml/", sp)
 
-	http.Handle("/index", sp.RequireAccount(
+	e := echo.New()
+
+	e.GET("/", func(ctx echo.Context) error {
+		return ctx.Redirect(http.StatusTemporaryRedirect, "/index")
+	})
+	e.GET("/index", echo.WrapHandler(sp.RequireAccount(
 		http.HandlerFunc(landingHandler),
-	))
-	http.Handle("/hello", sp.RequireAccount(
-		http.HandlerFunc(helloHandler),
-	))
+	)))
+	e.Any("/saml/", echo.WrapHandler(sp))
 
 	portString := fmt.Sprintf(":%d", webserverPort)
 	fmt.Println("server started at", portString)
-	http.ListenAndServe(portString, nil)
+	e.Start(portString)
 }
