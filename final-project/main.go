@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/gorilla/websocket"
+	"github.com/labstack/echo"
 )
 
 type M map[string]interface{}
@@ -35,36 +36,38 @@ type WebSocketConnection struct {
 }
 
 func main() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	e := echo.New()
+
+	e.GET("/", func(ctx echo.Context) error {
 		content, err := ioutil.ReadFile("template/chat.html")
 		if err != nil {
-			http.Error(w, "Could not open requested file", http.StatusInternalServerError)
-			return
+			return ctx.String(http.StatusInternalServerError, "could not open html")
 		}
 
-		fmt.Fprintf(w, "%s", content)
+		return ctx.HTML(http.StatusOK, string(content))
 	})
+	e.Static("/template", "template")
 
-	http.Handle("/template/", http.StripPrefix("/template/", http.FileServer(http.Dir("template"))))
-
-	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		currentGorillaConn, err := websocket.Upgrade(w, r, w.Header(), 1024, 1024)
+	e.Any("/ws", func(ctx echo.Context) error {
+		upgrader := websocket.Upgrader{
+			ReadBufferSize:  1024,
+			WriteBufferSize: 1024,
+		}
+		currentGorillaConn, err := upgrader.Upgrade(ctx.Response().Writer, ctx.Request(), nil)
 		if err != nil {
-			http.Error(w, "Could not open websocket connection", http.StatusBadRequest)
+			return ctx.String(http.StatusBadRequest, "Could not open websocket connection")
 		}
 
-		username := r.URL.Query().Get("username")
-		age := r.URL.Query().Get("age")
+		username := ctx.Request().URL.Query().Get("username")
+		age := ctx.Request().URL.Query().Get("age")
 		currentConn := WebSocketConnection{Conn: currentGorillaConn, Username: username, Age: age}
 		connections = append(connections, &currentConn)
 
 		go handleIO(&currentConn, connections)
+		return nil
 	})
 
-	fmt.Println("Server starting at :8080")
-	if err := http.ListenAndServe(":8080", nil); err != nil {
-		panic(err)
-	}
+	e.Start(":8080")
 }
 
 func handleIO(currentConn *WebSocketConnection, connections []*WebSocketConnection) {
