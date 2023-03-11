@@ -36,7 +36,7 @@ type WebSocketConnection struct {
 
 func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		content, err := ioutil.ReadFile("index.html")
+		content, err := ioutil.ReadFile("template/chat.html")
 		if err != nil {
 			http.Error(w, "Could not open requested file", http.StatusInternalServerError)
 			return
@@ -44,6 +44,8 @@ func main() {
 
 		fmt.Fprintf(w, "%s", content)
 	})
+
+	http.Handle("/template/", http.StripPrefix("/template/", http.FileServer(http.Dir("template"))))
 
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		currentGorillaConn, err := websocket.Upgrade(w, r, w.Header(), 1024, 1024)
@@ -60,7 +62,9 @@ func main() {
 	})
 
 	fmt.Println("Server starting at :8080")
-	http.ListenAndServe(":8080", nil)
+	if err := http.ListenAndServe(":8080", nil); err != nil {
+		panic(err)
+	}
 }
 
 func handleIO(currentConn *WebSocketConnection, connections []*WebSocketConnection) {

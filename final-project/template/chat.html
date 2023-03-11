@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket</title>
+
+    <link rel="stylesheet" href="/template/chat.css">
+    <script src="/template/chat.js"></script>
+</head>
+<body>
+<div class="container"></div>
+
+<div class="form">
+    <form onsubmit="app.doSendMessage(); return false;">
+        <div class="placeholder">
+            <label>Hello <b class="username"></b>, Age <b class="age"></b> Say something:</label>
+        </div>
+        <input class="input-message" type="text" placeholder="Enter message">
+        <button type="submit">Send</button>
+    </form>
+</div>
+</body>
+</html>
