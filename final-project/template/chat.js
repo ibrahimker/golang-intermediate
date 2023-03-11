@@ -46,11 +46,11 @@ app.init = function () {
 
         var messsage = ''
         if (res.Type === 'New User') {
-            message = 'User <b>' + res.From + '</b>: connected'
+            message = 'User <b>' + res.From + '</b>: connected at ' + new Date().toLocaleTimeString()
         } else if (res.Type === 'Leave') {
-            message = 'User <b>' + res.From + '</b>: disconnected'
+            message = 'User <b>' + res.From + '</b>: disconnected at ' + new Date().toLocaleTimeString()
         } else {
-            message = '<b>' + res.From + '</b>: ' + res.Message
+            message = '<b>' + res.From + '</b>' + new Date().toLocaleTimeString() + ': '+res.Message
         }
 
         app.print(message)

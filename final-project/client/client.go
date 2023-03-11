@@ -8,9 +8,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var connections []*WebSocketConnection
-
-type M map[string]interface{}
+var connections = make(map[string]*WebSocketConnection)
 
 const MESSAGE_NEW_USER = "New User"
 const MESSAGE_CHAT = "Chat"
@@ -20,7 +18,7 @@ type SocketPayload struct {
 	Message string
 }
 
-type SocketResponse struct {
+type Message struct {
 	From    string
 	Type    string
 	Message string
@@ -33,13 +31,7 @@ type WebSocketConnection struct {
 }
 
 func HandleIO(currentConn *WebSocketConnection) {
-	connections = append(connections, currentConn)
-	defer func() {
-		if r := recover(); r != nil {
-			log.Println("ERROR", fmt.Sprintf("%v", r))
-		}
-	}()
-
+	connections[currentConn.Username] = currentConn
 	broadcastMessage(currentConn, MESSAGE_NEW_USER, "")
 
 	for {
@@ -61,13 +53,7 @@ func HandleIO(currentConn *WebSocketConnection) {
 }
 
 func ejectConnection(currentConn *WebSocketConnection) {
-	var newConn []*WebSocketConnection
-	for _, conn := range connections {
-		if conn != currentConn {
-			newConn = append(newConn, conn)
-		}
-	}
-	connections = newConn
+	delete(connections, currentConn.Username)
 }
 
 func broadcastMessage(currentConn *WebSocketConnection, kind, message string) {
@@ -76,7 +62,7 @@ func broadcastMessage(currentConn *WebSocketConnection, kind, message string) {
 			continue
 		}
 
-		eachConn.WriteJSON(SocketResponse{
+		eachConn.WriteJSON(Message{
 			From:    fmt.Sprintf(currentConn.Username + " Age: " + currentConn.Age),
 			Type:    kind,
 			Message: message,
